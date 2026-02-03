@@ -20,7 +20,7 @@ set -euo pipefail
 
 # validation
 if (( $# != 7 )); then
-
+ 
   echo "ERROR: Provide the correct usage." >&2
 
   echo "USAGE: $0 <cluster> <region> <nodegroup> <nodes> <min> <max> <instance-type>"
@@ -262,6 +262,8 @@ main() {
 
     local cluster_name="$1"
 
+    local region="$2"
+
     sudo apt update && sudo apt upgrade -y
 
     zip_unzip_install
@@ -283,10 +285,8 @@ main() {
     is_jenkins_aws_configured
 
     eksctl_install
-
-    local name=$(eksctl get cluster --region ap-south-1 | grep -q "\b${cluster_name}\b")
     
-    if [[ "$name" != "$cluster_name" ]]; then
+    if ! aws eks describe-cluster --region "$region" --name "$cluster_name" >/dev/null 2>&1; then
 
         create_cluster "$@"
 
