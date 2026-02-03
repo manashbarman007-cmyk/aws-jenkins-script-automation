@@ -225,8 +225,6 @@ create_cluster() {
     # and kubectl works inside Jenkins pipelines.
     echo "INFO: configure aws for jenkins user"
 
-    sudo -u jenkins aws configure
-
     sudo -u jenkins aws eks --region "$region" update-kubeconfig --name "$cluster_name"
 
     # for the current user
@@ -285,7 +283,8 @@ main() {
     is_jenkins_aws_configured
 
     eksctl_install
-    
+
+    # only create the cluster if it does not exist
     if ! aws eks describe-cluster --region "$region" --name "$cluster_name" >/dev/null 2>&1; then
 
         create_cluster "$@"
@@ -295,6 +294,10 @@ main() {
     kubectl create namespace demo || echo "Namespace demo already exists"
 
     enable_services
+
+    echo "INFO: configure aws cli for the jenkins user"
+    
+    sudo -u jenkins aws configure
 
     echo "Setup complete. Jenkins can now deploy to EKS."
 
