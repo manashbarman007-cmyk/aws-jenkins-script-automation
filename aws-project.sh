@@ -184,11 +184,12 @@ is_jenkins_aws_configured() {
     
     if ! sudo -u jenkins aws sts get-caller-identity > /dev/null 2>&1; then
 
-        echo "WARNING: Jenkins AWS credentials not configured yet."
+        # we need to configure aws for the jenkins user to be able to use kubectl directly in the 
+        # jenkins pipeline
+        echo "INFO: configure aws for jenkins user"
 
-        echo "You must configure them before running Jenkins pipelines."
+        sudo -u jenkins aws configure
 
-        sleep 10
     fi
 }
 
@@ -223,6 +224,10 @@ create_cluster() {
 
     # for the current user
     aws eks --region "$region" update-kubeconfig --name "$cluster_name"
+
+    # for the jenkins user
+    sudo -u jenkins aws eks --region "$region" update-kubeconfig --name "$cluster_name"
+
 
 }
 
@@ -288,15 +293,6 @@ main() {
     kubectl create namespace demo || echo "Namespace demo already exists"
 
     enable_services
-
-    
-    # It runs "aws eks update-kubeconfig" as the Jenkins user, so the kubeconfig is created in Jenkins’s home directory
-    # and kubectl works inside Jenkins pipelines.
-    echo "INFO: configure aws for jenkins user"
-
-    sudo -u jenkins aws configure
-
-    sudo -u jenkins aws eks --region "$region" update-kubeconfig --name "$cluster_name"
     
     echo "Setup complete. Jenkins can now deploy to EKS."
 
