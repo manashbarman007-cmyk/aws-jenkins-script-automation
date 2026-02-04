@@ -39,8 +39,7 @@ spec:
             path: /actuator/health/readiness
             port: 8081
           initialDelaySeconds: 10
-          periodSeconds: 5
-		  
+          periodSeconds: 5 
 ---
 
 apiVersion: v1
