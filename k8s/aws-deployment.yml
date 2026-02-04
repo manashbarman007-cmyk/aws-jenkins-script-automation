@@ -6,7 +6,7 @@ metadata:
   labels:
     app: myapp
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
       app: myapp
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: manashbarman007/app:latest
+        image: manashbarman007/app:IMAGE_TAG
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8081
@@ -34,8 +34,13 @@ spec:
           limits:
             cpu: 500m
             memory: 256Mi
-
-
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 5
+		  
 ---
 
 apiVersion: v1
