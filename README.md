@@ -8,6 +8,7 @@ It also includes a **one-shot automation script** to set up all required tools a
 
 ## 📌 Architecture Overview
 
+```
 Developer Commit
       |
    Jenkins
@@ -19,7 +20,7 @@ Developer Commit
  AWS EKS (Kubernetes)
       |
  LoadBalancer Service → Application
-
+```
  
 ---
 
